@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Animax · Farmer Engagement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg:          #0a0a0a;
+      --surface-1:   #111111;
+      --surface-2:   #1a1a1a;
+      --surface-3:   #222222;
+      --border:      rgba(255,255,255,0.07);
+      --border-hover:rgba(255,255,255,0.15);
+      --text-primary:   #f5f5f7;
+      --text-secondary: #a1a1a6;
+      --text-tertiary:  #636366;
+      --green:  #30d158;
+      --red:    #ff453a;
+      --amber:  #ffd60a;
+      --blue:   #0a84ff;
+      --teal:   #5ac8fa;
+      --chart-line:  #0a84ff;
+      --chart-line2: #30d158;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,10,10,0.72);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .header-left { display: flex; flex-direction: column; gap: 2px; }
+
+    .wordmark {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+
+    h1 {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .header-controls { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .select-wrap { position: relative; display: flex; align-items: center; }
+
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 10px;
+      font-size: 10px;
+      color: var(--text-tertiary);
+      pointer-events: none;
+    }
+
+    select {
+      appearance: none;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 28px 8px 12px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      outline: none;
+    }
+    select:hover { border-color: var(--border-hover); background: var(--surface-3); }
+    select:focus { border-color: var(--blue); }
+
+    /* ── LAYOUT ── */
+    .main { max-width: 1240px; margin: 0 auto; padding: 28px 24px 48px; display: grid; gap: 16px; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      transition: border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+    }
+    .card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.1px;
+      color: var(--text-primary);
+    }
+    .card-sub {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      gap: 8px;
+    }
+
+    /* ── KPIs ── */
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+    .kpi {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      transition: border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+      cursor: default;
+    }
+    .kpi:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+
+    .kpi-value {
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      color: var(--text-primary);
+      margin-top: 10px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kpi-delta {
+      font-size: 12px;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+
+    .good  { color: var(--green); }
+    .warn  { color: var(--amber); }
+    .bad   { color: var(--red); }
+
+    /* ── SEPARATOR ── */
+    .kpi-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0 12px;
+    }
+
+    /* ── CHART GRID ── */
+    .grid-2 { display: grid; grid-template-columns: 1.8fr 1fr; gap: 16px; }
+
+    .chart-area {
+      position: relative;
+      height: 260px;
+    }
+
+    /* ── LEGEND ── */
+    .chart-legend { display: flex; gap: 16px; align-items: center; }
+    .legend-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .legend-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; }
+
+    /* ── SEGMENTS ── */
+    .segments { display: grid; gap: 10px; }
+
+    .segment {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .segment:hover { border-color: var(--border-hover); background: var(--surface-3); }
+
+    .segment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .segment-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .segment-count { font-size: 13px; font-weight: 600; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+    .bar-track {
+      height: 4px;
+      background: var(--surface-3);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 7px;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--blue);
+      transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .bar-fill.champions { background: var(--green); }
+    .bar-fill.growth    { background: var(--blue); }
+    .bar-fill.atrisk    { background: var(--red); }
+    .bar-fill.new       { background: var(--teal); }
+
+    .segment-note { font-size: 11px; color: var(--text-tertiary); }
+
+    /* ── ACTIVITY ── */
+    .activity-list { display: grid; gap: 8px; max-height: 320px; overflow-y: auto; padding-right: 4px; }
+    .activity-list::-webkit-scrollbar { width: 3px; }
+    .activity-list::-webkit-scrollbar-track { background: transparent; }
+    .activity-list::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 9px; }
+
+    .activity-row {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    }
+    .activity-row:hover {
+      border-color: var(--border-hover);
+      background: var(--surface-3);
+      transform: translateX(2px);
+    }
+
+    .activity-main { flex: 1; min-width: 0; }
+    .activity-text { font-size: 13px; font-weight: 500; color: var(--text-primary); line-height: 1.4; }
+    .activity-meta { font-size: 11px; color: var(--text-tertiary); margin-top: 3px; }
+
+    .pill {
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+    .pill.journey  { background: rgba(10,132,255,0.12); border-color: rgba(10,132,255,0.25); color: var(--blue); }
+    .pill.risk     { background: rgba(255,69,58,0.12); border-color: rgba(255,69,58,0.25); color: var(--red); }
+    .pill.campaign { background: rgba(48,209,88,0.12); border-color: rgba(48,209,88,0.25); color: var(--green); }
+    .pill.call     { background: rgba(90,200,250,0.12); border-color: rgba(90,200,250,0.25); color: var(--teal); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 960px) {
+      .kpis    { grid-template-columns: repeat(2, 1fr); }
+      .grid-2  { grid-template-columns: 1fr; }
+      .header  { padding: 14px 20px; }
+      .main    { padding: 20px 16px 40px; }
+    }
+    @media (max-width: 520px) {
+      .kpis    { grid-template-columns: 1fr 1fr; }
+      .kpi-value { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <span class="wordmark">Animax · Track 1</span>
+      <h1>Farmer Engagement Dashboard</h1>
+    </div>
+    <div class="header-controls">
+      <div class="select-wrap">
+        <select id="period">
+          <option value="7">Last 7 days</option>
+          <option value="14" selected>Last 14 days</option>
+          <option value="30">Last 30 days</option>
+        </select>
+      </div>
+      <div class="select-wrap">
+        <select id="region">
+          <option value="all">All regions</option>
+          <option value="north">North cluster</option>
+          <option value="east">East cluster</option>
+          <option value="central">Central cluster</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- KPIs -->
+    <div class="kpis" id="kpiGrid"></div>
+
+    <!-- TREND + SEGMENTS -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="title-row">
+          <div>
+            <div class="card-title">Engagement Trend</div>
+            <div class="card-sub">Daily active farmers &amp; response rate</div>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-label"><span class="legend-dot" style="background:var(--blue)"></span>Farmers</span>
+            <span class="legend-label"><span class="legend-dot" style="background:var(--green)"></span>Response %</span>
+          </div>
+        </div>
+        <div class="chart-area"><canvas id="trendChart"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="title-row">
+          <div>
+            <div class="card-title">Segment Snapshot</div>
+            <div class="card-sub">% share of active farmers</div>
+          </div>
+        </div>
+        <div class="segments" id="segments"></div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY -->
+    <div class="card">
+      <div class="title-row">
+        <div>
+          <div class="card-title">Recent Activity</div>
+          <div class="card-sub">Calls, WhatsApp, advisory journeys</div>
+        </div>
+      </div>
+      <div class="activity-list" id="activity"></div>
+    </div>
+
+  </main>
+
+  <script>
+    /* ── DATA ── */
+    const BASE = {
+      kpis: [
+        { label: 'Active Farmers',     value: 18420,    display: '18,420', delta: '+12.4% vs prev period', tone: 'good' },
+        { label: 'Engagement Rate',    value: 63.8,     display: '63.8%',  delta: '+4.1 pts',              tone: 'good' },
+        { label: 'Avg Sessions/Farmer',value: 3.2,      display: '3.2',    delta: '−0.3 vs target 3.5',   tone: 'warn' },
+        { label: 'Dormancy Risk',      value: 18.6,     display: '18.6%',  delta: '+2.8 pts this week',    tone: 'bad'  }
+      ],
+      trend: [
+        { d:'D1',  farmers:10800, rr:52 }, { d:'D2',  farmers:11220, rr:54 },
+        { d:'D3',  farmers:11680, rr:56 }, { d:'D4',  farmers:12100, rr:55 },
+        { d:'D5',  farmers:12780, rr:58 }, { d:'D6',  farmers:13340, rr:59 },
+        { d:'D7',  farmers:13720, rr:60 }, { d:'D8',  farmers:14110, rr:61 },
+        { d:'D9',  farmers:14500, rr:63 }, { d:'D10', farmers:14920, rr:62 },
+        { d:'D11', farmers:15310, rr:64 }, { d:'D12', farmers:16040, rr:65 },
+        { d:'D13', farmers:16720, rr:67 }, { d:'D14', farmers:17180, rr:68 }
+      ],
+      segments: [
+        { name:'Champions',   farmers:5240,  share:28, note:'Strong advisory completion',       cls:'champions' },
+        { name:'Growth',      farmers:6810,  share:37, note:'Respond but low order conversion', cls:'growth'    },
+        { name:'At-Risk',     farmers:3420,  share:19, note:'No response in last 7 days',       cls:'atrisk'    },
+        { name:'New Joiners', farmers:2950,  share:16, note:'Onboarding campaigns active',      cls:'new'       }
+      ],
+      activity: [
+        { time:'2 min ago',      loc:'Kota FPO cohort',  text:'152 farmers completed wheat advisory journey',    tag:'Journey complete',    cls:'journey'  },
+        { time:'14 min ago',     loc:'Lucknow cluster',  text:'Dormancy alert triggered for 87 farmers',         tag:'Risk alert',          cls:'risk'     },
+        { time:'31 min ago',     loc:'Banda block',      text:'WhatsApp campaign CTR reached 21.3%',             tag:'Campaign',            cls:'campaign' },
+        { time:'49 min ago',     loc:'Mandi region',     text:'Call center connected with 230 farmers',          tag:'Call engagement',     cls:'call'     },
+        { time:'1 hr ago',       loc:'Jhansi East',      text:'Input order reminder sent to 1,120 farmers',      tag:'Reminder',            cls:''         },
+        { time:'1 hr 22 min ago',loc:'Kanpur rural',     text:'New onboarding flow launched for millet cycle',   tag:'Rollout',             cls:''         },
+        { time:'2 hr ago',       loc:'Sitapur',          text:'Field officer follow-up for 64 at-risk farmers',  tag:'Retention',           cls:''         }
+      ]
+    };
+
+    /* ── KPI RENDER ── */
+    function renderKPIs(kpis) {
+      const grid = document.getElementById('kpiGrid');
+      grid.innerHTML = '';
+      kpis.forEach(k => {
+        const d = document.createElement('div');
+        d.className = 'kpi';
+        d.innerHTML = `
+          <div class="kpi-label">${k.label}</div>
+          <div class="kpi-value">${k.display}</div>
+          <div class="kpi-delta ${k.tone}">${k.delta}</div>
+        `;
+        grid.appendChild(d);
+      });
+    }
+
+    /* ── CHART ── */
+    let trendChart = null;
+
+    function renderTrend(period) {
+      const data = BASE.trend.slice(-period);
+      const labels   = data.map(r => r.d);
+      const farmers  = data.map(r => r.farmers);
+      const rr       = data.map(r => r.rr);
+
+      const ctx = document.getElementById('trendChart').getContext('2d');
+
+      // Blue gradient fill
+      const grad = ctx.createLinearGradient(0, 0, 0, 240);
+      grad.addColorStop(0, 'rgba(10,132,255,0.18)');
+      grad.addColorStop(1, 'rgba(10,132,255,0)');
+
+      if (trendChart) trendChart.destroy();
+
+      trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Active Farmers',
+              data: farmers,
+              yAxisID: 'yLeft',
+              borderColor: '#0a84ff',
+              backgroundColor: grad,
+              borderWidth: 2.5,
+              tension: 0.45,
+              fill: true,
+              pointRadius: 0,
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: '#0a84ff',
+              pointHoverBorderColor: '#fff',
+              pointHoverBorderWidth: 2
+            },
+            {
+              label: 'Response Rate (%)',
+              data: rr,
+              yAxisID: 'yRight',
+              borderColor: '#30d158',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              borderDash: [4, 4],
+              tension: 0.45,
+              fill: false,
+              pointRadius: 0,
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: '#30d158',
+              pointHoverBorderColor: '#fff',
+              pointHoverBorderWidth: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          animation: { duration: 400, easing: 'easeInOutQuart' },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1a1a1a',
+              borderColor: 'rgba(255,255,255,0.1)',
+              borderWidth: 1,
+              titleColor: '#a1a1a6',
+              bodyColor: '#f5f5f7',
+              padding: 12,
+              cornerRadius: 12,
+              titleFont: { family: 'Inter', size: 11, weight: '500' },
+              bodyFont:  { family: 'Inter', size: 13, weight: '600' },
+              callbacks: {
+                label: ctx => {
+                  const v = ctx.parsed.y;
+                  return ctx.datasetIndex === 0
+                    ? ` ${v.toLocaleString()} farmers`
+                    : ` ${v}% response`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              border: { display: false },
+              ticks: {
+                color: '#636366',
+                font: { family: 'Inter', size: 11 },
+                maxTicksLimit: 8
+              }
+            },
+            yLeft: {
+              position: 'left',
+              grid: {
+                color: 'rgba(255,255,255,0.04)',
+                drawTicks: false
+              },
+              border: { display: false, dash: [2, 2] },
+              ticks: {
+                color: '#636366',
+                font: { family: 'Inter', size: 11 },
+                maxTicksLimit: 5,
+                callback: v => (v >= 1000 ? (v/1000).toFixed(0)+'k' : v)
+              }
+            },
+            yRight: {
+              position: 'right',
+              grid: { display: false },
+              border: { display: false },
+              ticks: {
+                color: '#636366',
+                font: { family: 'Inter', size: 11 },
+                maxTicksLimit: 5,
+                callback: v => v + '%'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    /* ── SEGMENTS ── */
+    function renderSegments() {
+      const el = document.getElementById('segments');
+      el.innerHTML = '';
+      BASE.segments.forEach(s => {
+        const d = document.createElement('div');
+        d.className = 'segment';
+        d.innerHTML = `
+          <div class="segment-header">
+            <span class="segment-name">${s.name}</span>
+            <span class="segment-count">${s.farmers.toLocaleString()}</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill ${s.cls}" style="width:0%" data-w="${s.share}%"></div></div>
+          <div class="segment-note">${s.share}% — ${s.note}</div>
+        `;
+        el.appendChild(d);
+      });
+      // Animate bars after paint
+      requestAnimationFrame(() => {
+        document.querySelectorAll('.bar-fill').forEach(b => {
+          b.style.width = b.dataset.w;
+        });
+      });
+    }
+
+    /* ── ACTIVITY ── */
+    function renderActivity() {
+      const el = document.getElementById('activity');
+      el.innerHTML = '';
+      BASE.activity.forEach(a => {
+        const d = document.createElement('div');
+        d.className = 'activity-row';
+        d.innerHTML = `
+          <div class="activity-main">
+            <div class="activity-text">${a.text}</div>
+            <div class="activity-meta">${a.time} · ${a.loc}</div>
+          </div>
+          <span class="pill ${a.cls}">${a.tag}</span>
+        `;
+        el.appendChild(d);
+      });
+    }
+
+    /* ── FILTERS ── */
+    function applyRegion(region) {
+      const m = region === 'all' ? 1 : region === 'north' ? 1.06 : region === 'east' ? 0.95 : 0.9;
+      const kpis = JSON.parse(JSON.stringify(BASE.kpis));
+      kpis[0].display = Math.round(18420 * m).toLocaleString();
+      kpis[1].display = (63.8 * m).toFixed(1) + '%';
+      kpis[2].display = (3.2 * (region === 'all' ? 1 : 0.96)).toFixed(1);
+      kpis[3].display = (18.6 * (2 - m)).toFixed(1) + '%';
+      renderKPIs(kpis);
+    }
+
+    /* ── INIT ── */
+    const periodSel = document.getElementById('period');
+    const regionSel = document.getElementById('region');
+
+    periodSel.addEventListener('change', () => renderTrend(+periodSel.value));
+    regionSel.addEventListener('change', () => applyRegion(regionSel.value));
+
+    renderKPIs(BASE.kpis);
+    renderTrend(14);
+    renderSegments();
+    renderActivity();
+  </script>
+</body>
+</html>
