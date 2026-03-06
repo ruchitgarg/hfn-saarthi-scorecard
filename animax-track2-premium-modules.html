@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Animax Premium Modules Demo</title>
+  <style>
+    :root {
+      --bg: #070b1a;
+      --card: #10172c;
+      --muted: #9fa9c4;
+      --text: #eef2ff;
+      --accent: #7c5cff;
+      --accent-2: #08d1ff;
+      --danger: #ff667f;
+      --ok: #52e0a7;
+      --line: #24304f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: radial-gradient(1200px 800px at 85% -20%, #2d2a7d 0%, transparent 60%), var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 20px; }
+    h1 { margin: 0 0 6px; font-size: 28px; }
+    .sub { color: var(--muted); margin-bottom: 20px; }
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      background: rgba(16,23,44,.8); border: 1px solid var(--line); border-radius: 12px; padding: 12px;
+      position: sticky; top: 12px; backdrop-filter: blur(6px); z-index: 5;
+    }
+    select, button {
+      background: #0d1430; color: var(--text); border: 1px solid var(--line); border-radius: 10px;
+      padding: 10px 12px; font-weight: 600;
+    }
+    button.primary { background: linear-gradient(90deg, var(--accent), var(--accent-2)); border: none; color: #fff; }
+    .hint { color: var(--muted); font-size: 12px; }
+
+    .teaser {
+      margin-top: 16px;
+      background: linear-gradient(120deg, rgba(124,92,255,.2), rgba(8,209,255,.13));
+      border: 1px solid rgba(124,92,255,.45);
+      border-radius: 14px;
+      padding: 16px;
+      display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center;
+    }
+    .teaser .title { font-size: 18px; font-weight: 700; }
+    .teaser .meta { color: var(--muted); font-size: 13px; }
+
+    .cards {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 14px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--card);
+      overflow: hidden;
+      min-height: 210px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .thumb {
+      height: 110px;
+      background: linear-gradient(130deg, #2e3c72, #101a37);
+      border-bottom: 1px solid var(--line);
+      position: relative;
+    }
+    .pill {
+      position: absolute; top: 10px; left: 10px;
+      font-size: 11px; font-weight: 700; letter-spacing: .3px;
+      background: rgba(7,11,26,.8); border: 1px solid #3b4672; border-radius: 999px; padding: 5px 9px;
+    }
+    .lock {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(0,0,0,.55); border: 1px solid #4a557d; border-radius: 10px; padding: 4px 7px; font-size: 12px;
+    }
+    .body { padding: 12px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .name { font-weight: 700; }
+    .desc { color: var(--muted); font-size: 13px; min-height: 38px; }
+    .row { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+    .status {
+      font-size: 12px; font-weight: 700; border-radius: 999px; padding: 4px 9px;
+      border: 1px solid transparent;
+    }
+    .s-open { color: var(--ok); border-color: rgba(82,224,167,.4); background: rgba(82,224,167,.1); }
+    .s-locked { color: #ffd58b; border-color: rgba(255,213,139,.4); background: rgba(255,213,139,.1); }
+    .s-expired { color: var(--danger); border-color: rgba(255,102,127,.4); background: rgba(255,102,127,.12); }
+
+    .ghost { background: transparent; border-color: #3e4a77; }
+    .card.is-locked .thumb { filter: grayscale(0.6) blur(.2px) brightness(.75); }
+    .card.is-locked .name, .card.is-locked .desc { opacity: .9; }
+
+    .modal {
+      position: fixed; inset: 0; background: rgba(3,8,20,.7); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center; padding: 20px; z-index: 99;
+    }
+    .modal.show { display: flex; }
+    .sheet {
+      width: min(760px, 100%); border: 1px solid var(--line); border-radius: 16px;
+      background: #0d1429; box-shadow: 0 20px 60px rgba(0,0,0,.45); overflow: hidden;
+    }
+    .sheetHead { padding: 16px; border-bottom: 1px solid var(--line); }
+    .sheetBody { padding: 16px; display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 12px; }
+    .plan {
+      border: 1px solid #2f3a63; border-radius: 12px; padding: 12px; background: #0e1731;
+    }
+    .plan.featured { border-color: #6f62f8; background: linear-gradient(180deg, rgba(124,92,255,.2), rgba(124,92,255,.05)); }
+    .plan h3 { margin: 2px 0 6px; }
+    .price { font-size: 22px; font-weight: 800; margin: 8px 0; }
+    ul { margin: 0; padding-left: 18px; color: var(--muted); }
+    .sheetFoot { padding: 16px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Animax Premium UX Demo</h1>
+    <div class="sub">Track 2: locked modules, teaser rail, upgrade funnel, and state-based gating.</div>
+
+    <div class="toolbar">
+      <label>
+        Access state:
+        <select id="state">
+          <option value="free">Free user</option>
+          <option value="trial">Trial active</option>
+          <option value="premium">Premium active</option>
+          <option value="expired">Premium expired</option>
+        </select>
+      </label>
+      <button class="primary" id="upgradeTop">Upgrade to Premium</button>
+      <span class="hint">Click any locked module to open funnel CTA.</span>
+    </div>
+
+    <section class="teaser" id="teaser"></section>
+    <section class="cards" id="cards"></section>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="sheet">
+      <div class="sheetHead">
+        <div style="font-size:12px;color:var(--muted);">Upgrade Funnel</div>
+        <div style="font-size:20px;font-weight:800;" id="modalTitle">Unlock Premium</div>
+        <div class="hint" id="modalSubtitle">Get full Animax learning modules and assignments.</div>
+      </div>
+      <div class="sheetBody">
+        <div class="plan">
+          <div class="hint">Starter</div>
+          <h3>Monthly</h3>
+          <div class="price">Rs 149</div>
+          <ul><li>All premium modules</li><li>Basic analytics</li><li>Cancel anytime</li></ul>
+        </div>
+        <div class="plan featured">
+          <div class="hint">Best value</div>
+          <h3>Annual Pro</h3>
+          <div class="price">Rs 1199</div>
+          <ul><li>2 months free</li><li>Priority support</li><li>Certificate track</li></ul>
+        </div>
+        <div class="plan">
+          <div class="hint">Teams</div>
+          <h3>School Pack</h3>
+          <div class="price">Contact us</div>
+          <ul><li>Bulk seats</li><li>Teacher dashboard</li><li>Usage reports</li></ul>
+        </div>
+      </div>
+      <div class="sheetFoot">
+        <button class="ghost" id="closeModal">Maybe later</button>
+        <button class="primary" id="fakeCheckout">Continue to Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modules = [
+      { name: 'Intro to Motion', tier: 'free', teaser: false, desc: 'Foundations and warm-up lessons.' },
+      { name: 'Character FX Pack', tier: 'premium', teaser: true, desc: 'Particles, trails, and glow pipelines.' },
+      { name: 'Studio Templates', tier: 'premium', teaser: true, desc: 'Ready-made scenes and export presets.' },
+      { name: 'Live Mentorship', tier: 'premium', teaser: false, desc: 'Weekly office hours with mentors.' },
+      { name: 'Portfolio Review', tier: 'premium', teaser: false, desc: 'Get expert review for top projects.' },
+      { name: 'Community Challenges', tier: 'free', teaser: false, desc: 'Public monthly challenge board.' },
+    ];
+
+    const stateEl = document.getElementById('state');
+    const cardsEl = document.getElementById('cards');
+    const teaserEl = document.getElementById('teaser');
+    const modal = document.getElementById('modal');
+
+    function accessFor(userState, moduleTier) {
+      if (moduleTier === 'free') return 'open';
+      if (userState === 'premium' || userState === 'trial') return 'open';
+      if (userState === 'expired') return 'expired';
+      return 'locked';
+    }
+
+    function renderTeaser(state) {
+      const lockedCount = modules.filter(m => m.tier === 'premium' && accessFor(state, m.tier) !== 'open').length;
+      const label = state === 'premium'
+        ? 'You have full premium access'
+        : lockedCount + ' premium modules waiting for you';
+
+      teaserEl.innerHTML = `
+        <div>
+          <div class="title">Premium Plan Teaser</div>
+          <div class="meta">${label} · Includes templates, mentorship, and certificate track.</div>
+        </div>
+        <button class="primary" onclick="openFunnel('plan teaser rail')">See Plans</button>
+      `;
+    }
+
+    function statusBadge(status) {
+      if (status === 'open') return '<span class="status s-open">Accessible</span>';
+      if (status === 'expired') return '<span class="status s-expired">Renew required</span>';
+      return '<span class="status s-locked">Premium locked</span>';
+    }
+
+    function renderCards() {
+      const state = stateEl.value;
+      renderTeaser(state);
+      cardsEl.innerHTML = '';
+
+      modules.forEach((m, i) => {
+        const status = accessFor(state, m.tier);
+        const locked = status !== 'open';
+        const card = document.createElement('article');
+        card.className = 'card' + (locked ? ' is-locked' : '');
+        card.innerHTML = `
+          <div class="thumb">
+            <span class="pill">${m.tier === 'premium' ? 'PREMIUM' : 'FREE'}</span>
+            ${locked ? '<span class="lock">LOCKED</span>' : ''}
+          </div>
+          <div class="body">
+            <div class="name">${m.name}</div>
+            <div class="desc">${m.desc}</div>
+            <div class="row">
+              ${statusBadge(status)}
+              <button class="${locked ? 'primary' : 'ghost'}">${locked ? 'Unlock' : 'Open'}</button>
+            </div>
+          </div>
+        `;
+        card.querySelector('button').addEventListener('click', () => {
+          if (locked) openFunnel(m.name);
+          else alert('Module opened: ' + m.name + ' (demo action)');
+        });
+        cardsEl.appendChild(card);
+      });
+    }
+
+    function openFunnel(source) {
+      document.getElementById('modalTitle').textContent = 'Unlock from: ' + source;
+      modal.classList.add('show');
+    }
+
+    window.openFunnel = openFunnel;
+
+    stateEl.addEventListener('change', renderCards);
+    document.getElementById('upgradeTop').addEventListener('click', () => openFunnel('top CTA'));
+    document.getElementById('closeModal').addEventListener('click', () => modal.classList.remove('show'));
+    document.getElementById('fakeCheckout').addEventListener('click', () => {
+      alert('Checkout started (demo only)');
+      modal.classList.remove('show');
+    });
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+
+    renderCards();
+  </script>
+</body>
+</html>
