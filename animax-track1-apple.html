@@ -10,26 +10,23 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      --bg:          #0a0a0a;
-      --surface-1:   #111111;
-      --surface-2:   #1a1a1a;
-      --surface-3:   #222222;
-      --border:      rgba(255,255,255,0.07);
-      --border-hover:rgba(255,255,255,0.15);
-      --text-primary:   #f5f5f7;
-      --text-secondary: #a1a1a6;
-      --text-tertiary:  #636366;
-      --green:  #30d158;
-      --red:    #ff453a;
-      --amber:  #ffd60a;
-      --blue:   #0a84ff;
-      --teal:   #5ac8fa;
-      --chart-line:  #0a84ff;
-      --chart-line2: #30d158;
+      --bg:             #F5F5F7;
+      --surface:        #FFFFFF;
+      --surface-2:      #F5F5F7;
+      --surface-3:      #EBEBED;
+      --border:         #E5E5EA;
+      --border-hover:   #C7C7CC;
+      --text-primary:   #1D1D1F;
+      --text-secondary: #48484A;
+      --text-tertiary:  #8E8E93;
+      --blue:   #007AFF;
+      --green:  #34C759;
+      --red:    #FF3B30;
+      --amber:  #FF9500;
+      --teal:   #5AC8FA;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
 
     body {
@@ -45,7 +42,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(10,10,10,0.72);
+      background: rgba(255,255,255,0.85);
       backdrop-filter: blur(24px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
       border-bottom: 1px solid var(--border);
@@ -62,7 +59,7 @@
     .wordmark {
       font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--text-tertiary);
     }
@@ -78,7 +75,6 @@
     .header-controls { display: flex; gap: 10px; flex-wrap: wrap; }
 
     .select-wrap { position: relative; display: flex; align-items: center; }
-
     .select-wrap::after {
       content: '▾';
       position: absolute;
@@ -90,7 +86,7 @@
 
     select {
       appearance: none;
-      background: var(--surface-2);
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
       color: var(--text-primary);
@@ -99,27 +95,28 @@
       font-weight: 500;
       padding: 8px 28px 8px 12px;
       cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
+      transition: border-color 0.18s, box-shadow 0.18s;
       outline: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
-    select:hover { border-color: var(--border-hover); background: var(--surface-3); }
-    select:focus { border-color: var(--blue); }
+    select:hover { border-color: var(--border-hover); }
+    select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,122,255,0.12); }
 
     /* ── LAYOUT ── */
-    .main { max-width: 1240px; margin: 0 auto; padding: 28px 24px 48px; display: grid; gap: 16px; }
+    .main { max-width: 1240px; margin: 0 auto; padding: 28px 24px 56px; display: grid; gap: 16px; }
 
     /* ── CARDS ── */
     .card {
-      background: var(--surface-1);
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 20px;
+      border-radius: 18px;
       padding: 24px;
-      transition: border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 0 0 0 transparent;
+      transition: box-shadow 0.22s, transform 0.18s;
     }
     .card:hover {
-      border-color: var(--border-hover);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.09);
       transform: translateY(-1px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
 
     .card-title {
@@ -130,7 +127,6 @@
     }
     .card-sub {
       font-size: 12px;
-      font-weight: 400;
       color: var(--text-tertiary);
       margin-top: 2px;
     }
@@ -146,20 +142,20 @@
     .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 
     .kpi {
-      background: var(--surface-1);
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 20px 22px;
+      border-radius: 18px;
+      padding: 22px 24px;
       display: flex;
       flex-direction: column;
       gap: 0;
-      transition: border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: box-shadow 0.22s, transform 0.18s;
       cursor: default;
     }
     .kpi:hover {
-      border-color: var(--border-hover);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
       transform: translateY(-2px);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
     }
 
     .kpi-label {
@@ -190,14 +186,6 @@
     .warn  { color: var(--amber); }
     .bad   { color: var(--red); }
 
-    /* ── SEPARATOR ── */
-    .kpi-divider {
-      width: 100%;
-      height: 1px;
-      background: var(--border);
-      margin: 4px 0 12px;
-    }
-
     /* ── CHART GRID ── */
     .grid-2 { display: grid; grid-template-columns: 1.8fr 1fr; gap: 16px; }
 
@@ -214,7 +202,14 @@
       height: 8px;
       border-radius: 50%;
     }
-    .legend-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; }
+    .legend-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
 
     /* ── SEGMENTS ── */
     .segments { display: grid; gap: 10px; }
@@ -224,9 +219,12 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 14px 16px;
-      transition: border-color 0.2s, background 0.2s;
+      transition: border-color 0.18s, background 0.18s;
     }
-    .segment:hover { border-color: var(--border-hover); background: var(--surface-3); }
+    .segment:hover {
+      border-color: var(--border-hover);
+      background: var(--surface-3);
+    }
 
     .segment-header {
       display: flex;
@@ -235,7 +233,12 @@
       margin-bottom: 10px;
     }
     .segment-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
-    .segment-count { font-size: 13px; font-weight: 600; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .segment-count {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
 
     .bar-track {
       height: 4px;
@@ -258,21 +261,27 @@
     .segment-note { font-size: 11px; color: var(--text-tertiary); }
 
     /* ── ACTIVITY ── */
-    .activity-list { display: grid; gap: 8px; max-height: 320px; overflow-y: auto; padding-right: 4px; }
+    .activity-list {
+      display: grid;
+      gap: 8px;
+      max-height: 320px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
     .activity-list::-webkit-scrollbar { width: 3px; }
     .activity-list::-webkit-scrollbar-track { background: transparent; }
-    .activity-list::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 9px; }
+    .activity-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 9px; }
 
     .activity-row {
       background: var(--surface-2);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 12px 16px;
+      padding: 13px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      transition: border-color 0.18s, background 0.18s, transform 0.15s;
     }
     .activity-row:hover {
       border-color: var(--border-hover);
@@ -281,8 +290,17 @@
     }
 
     .activity-main { flex: 1; min-width: 0; }
-    .activity-text { font-size: 13px; font-weight: 500; color: var(--text-primary); line-height: 1.4; }
-    .activity-meta { font-size: 11px; color: var(--text-tertiary); margin-top: 3px; }
+    .activity-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+    .activity-meta {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 3px;
+    }
 
     .pill {
       flex-shrink: 0;
@@ -296,21 +314,21 @@
       letter-spacing: 0.01em;
       white-space: nowrap;
     }
-    .pill.journey  { background: rgba(10,132,255,0.12); border-color: rgba(10,132,255,0.25); color: var(--blue); }
-    .pill.risk     { background: rgba(255,69,58,0.12); border-color: rgba(255,69,58,0.25); color: var(--red); }
-    .pill.campaign { background: rgba(48,209,88,0.12); border-color: rgba(48,209,88,0.25); color: var(--green); }
-    .pill.call     { background: rgba(90,200,250,0.12); border-color: rgba(90,200,250,0.25); color: var(--teal); }
+    .pill.journey  { background: rgba(0,122,255,0.08);  border-color: rgba(0,122,255,0.2);  color: var(--blue);  }
+    .pill.risk     { background: rgba(255,59,48,0.08);  border-color: rgba(255,59,48,0.2);  color: var(--red);   }
+    .pill.campaign { background: rgba(52,199,89,0.08);  border-color: rgba(52,199,89,0.2);  color: var(--green); }
+    .pill.call     { background: rgba(90,200,250,0.10); border-color: rgba(90,200,250,0.25);color: #0090C7;      }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 960px) {
-      .kpis    { grid-template-columns: repeat(2, 1fr); }
-      .grid-2  { grid-template-columns: 1fr; }
-      .header  { padding: 14px 20px; }
-      .main    { padding: 20px 16px 40px; }
+      .kpis   { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+      .header { padding: 14px 20px; }
+      .main   { padding: 20px 16px 40px; }
     }
     @media (max-width: 520px) {
-      .kpis    { grid-template-columns: 1fr 1fr; }
-      .kpi-value { font-size: 26px; }
+      .kpis       { grid-template-columns: 1fr 1fr; }
+      .kpi-value  { font-size: 26px; }
     }
   </style>
 </head>
@@ -356,8 +374,12 @@
             <div class="card-sub">Daily active farmers &amp; response rate</div>
           </div>
           <div class="chart-legend">
-            <span class="legend-label"><span class="legend-dot" style="background:var(--blue)"></span>Farmers</span>
-            <span class="legend-label"><span class="legend-dot" style="background:var(--green)"></span>Response %</span>
+            <span class="legend-label">
+              <span class="legend-dot" style="background:var(--blue)"></span>Farmers
+            </span>
+            <span class="legend-label">
+              <span class="legend-dot" style="background:var(--green)"></span>Response %
+            </span>
           </div>
         </div>
         <div class="chart-area"><canvas id="trendChart"></canvas></div>
@@ -391,10 +413,10 @@
     /* ── DATA ── */
     const BASE = {
       kpis: [
-        { label: 'Active Farmers',     value: 18420,    display: '18,420', delta: '+12.4% vs prev period', tone: 'good' },
-        { label: 'Engagement Rate',    value: 63.8,     display: '63.8%',  delta: '+4.1 pts',              tone: 'good' },
-        { label: 'Avg Sessions/Farmer',value: 3.2,      display: '3.2',    delta: '−0.3 vs target 3.5',   tone: 'warn' },
-        { label: 'Dormancy Risk',      value: 18.6,     display: '18.6%',  delta: '+2.8 pts this week',    tone: 'bad'  }
+        { label: 'Active Farmers',      display: '18,420', delta: '+12.4% vs prev period', tone: 'good' },
+        { label: 'Engagement Rate',     display: '63.8%',  delta: '+4.1 pts',              tone: 'good' },
+        { label: 'Avg Sessions/Farmer', display: '3.2',    delta: '−0.3 vs target 3.5',   tone: 'warn' },
+        { label: 'Dormancy Risk',       display: '18.6%',  delta: '+2.8 pts this week',    tone: 'bad'  }
       ],
       trend: [
         { d:'D1',  farmers:10800, rr:52 }, { d:'D2',  farmers:11220, rr:54 },
@@ -406,19 +428,19 @@
         { d:'D13', farmers:16720, rr:67 }, { d:'D14', farmers:17180, rr:68 }
       ],
       segments: [
-        { name:'Champions',   farmers:5240,  share:28, note:'Strong advisory completion',       cls:'champions' },
-        { name:'Growth',      farmers:6810,  share:37, note:'Respond but low order conversion', cls:'growth'    },
-        { name:'At-Risk',     farmers:3420,  share:19, note:'No response in last 7 days',       cls:'atrisk'    },
-        { name:'New Joiners', farmers:2950,  share:16, note:'Onboarding campaigns active',      cls:'new'       }
+        { name:'Champions',   farmers:5240, share:28, note:'Strong advisory completion',       cls:'champions' },
+        { name:'Growth',      farmers:6810, share:37, note:'Respond but low order conversion', cls:'growth'    },
+        { name:'At-Risk',     farmers:3420, share:19, note:'No response in last 7 days',       cls:'atrisk'    },
+        { name:'New Joiners', farmers:2950, share:16, note:'Onboarding campaigns active',      cls:'new'       }
       ],
       activity: [
-        { time:'2 min ago',      loc:'Kota FPO cohort',  text:'152 farmers completed wheat advisory journey',    tag:'Journey complete',    cls:'journey'  },
-        { time:'14 min ago',     loc:'Lucknow cluster',  text:'Dormancy alert triggered for 87 farmers',         tag:'Risk alert',          cls:'risk'     },
-        { time:'31 min ago',     loc:'Banda block',      text:'WhatsApp campaign CTR reached 21.3%',             tag:'Campaign',            cls:'campaign' },
-        { time:'49 min ago',     loc:'Mandi region',     text:'Call center connected with 230 farmers',          tag:'Call engagement',     cls:'call'     },
-        { time:'1 hr ago',       loc:'Jhansi East',      text:'Input order reminder sent to 1,120 farmers',      tag:'Reminder',            cls:''         },
-        { time:'1 hr 22 min ago',loc:'Kanpur rural',     text:'New onboarding flow launched for millet cycle',   tag:'Rollout',             cls:''         },
-        { time:'2 hr ago',       loc:'Sitapur',          text:'Field officer follow-up for 64 at-risk farmers',  tag:'Retention',           cls:''         }
+        { time:'2 min ago',       loc:'Kota FPO cohort',  text:'152 farmers completed wheat advisory journey',    tag:'Journey complete', cls:'journey'  },
+        { time:'14 min ago',      loc:'Lucknow cluster',  text:'Dormancy alert triggered for 87 farmers',         tag:'Risk alert',       cls:'risk'     },
+        { time:'31 min ago',      loc:'Banda block',      text:'WhatsApp campaign CTR reached 21.3%',             tag:'Campaign',         cls:'campaign' },
+        { time:'49 min ago',      loc:'Mandi region',     text:'Call center connected with 230 farmers',          tag:'Call engagement',  cls:'call'     },
+        { time:'1 hr ago',        loc:'Jhansi East',      text:'Input order reminder sent to 1,120 farmers',      tag:'Reminder',         cls:''         },
+        { time:'1 hr 22 min ago', loc:'Kanpur rural',     text:'New onboarding flow launched for millet cycle',   tag:'Rollout',          cls:''         },
+        { time:'2 hr ago',        loc:'Sitapur',          text:'Field officer follow-up for 64 at-risk farmers',  tag:'Retention',        cls:''         }
       ]
     };
 
@@ -442,17 +464,16 @@
     let trendChart = null;
 
     function renderTrend(period) {
-      const data = BASE.trend.slice(-period);
-      const labels   = data.map(r => r.d);
-      const farmers  = data.map(r => r.farmers);
-      const rr       = data.map(r => r.rr);
+      const data   = BASE.trend.slice(-period);
+      const labels  = data.map(r => r.d);
+      const farmers = data.map(r => r.farmers);
+      const rr      = data.map(r => r.rr);
 
       const ctx = document.getElementById('trendChart').getContext('2d');
 
-      // Blue gradient fill
       const grad = ctx.createLinearGradient(0, 0, 0, 240);
-      grad.addColorStop(0, 'rgba(10,132,255,0.18)');
-      grad.addColorStop(1, 'rgba(10,132,255,0)');
+      grad.addColorStop(0, 'rgba(0,122,255,0.12)');
+      grad.addColorStop(1, 'rgba(0,122,255,0)');
 
       if (trendChart) trendChart.destroy();
 
@@ -465,14 +486,14 @@
               label: 'Active Farmers',
               data: farmers,
               yAxisID: 'yLeft',
-              borderColor: '#0a84ff',
+              borderColor: '#007AFF',
               backgroundColor: grad,
               borderWidth: 2.5,
               tension: 0.45,
               fill: true,
               pointRadius: 0,
               pointHoverRadius: 5,
-              pointHoverBackgroundColor: '#0a84ff',
+              pointHoverBackgroundColor: '#007AFF',
               pointHoverBorderColor: '#fff',
               pointHoverBorderWidth: 2
             },
@@ -480,7 +501,7 @@
               label: 'Response Rate (%)',
               data: rr,
               yAxisID: 'yRight',
-              borderColor: '#30d158',
+              borderColor: '#34C759',
               backgroundColor: 'transparent',
               borderWidth: 2,
               borderDash: [4, 4],
@@ -488,7 +509,7 @@
               fill: false,
               pointRadius: 0,
               pointHoverRadius: 5,
-              pointHoverBackgroundColor: '#30d158',
+              pointHoverBackgroundColor: '#34C759',
               pointHoverBorderColor: '#fff',
               pointHoverBorderWidth: 2
             }
@@ -502,13 +523,14 @@
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: '#1a1a1a',
-              borderColor: 'rgba(255,255,255,0.1)',
+              backgroundColor: '#FFFFFF',
+              borderColor: '#E5E5EA',
               borderWidth: 1,
-              titleColor: '#a1a1a6',
-              bodyColor: '#f5f5f7',
+              titleColor: '#8E8E93',
+              bodyColor: '#1D1D1F',
               padding: 12,
               cornerRadius: 12,
+              boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
               titleFont: { family: 'Inter', size: 11, weight: '500' },
               bodyFont:  { family: 'Inter', size: 13, weight: '600' },
               callbacks: {
@@ -526,7 +548,7 @@
               grid: { display: false },
               border: { display: false },
               ticks: {
-                color: '#636366',
+                color: '#8E8E93',
                 font: { family: 'Inter', size: 11 },
                 maxTicksLimit: 8
               }
@@ -534,12 +556,12 @@
             yLeft: {
               position: 'left',
               grid: {
-                color: 'rgba(255,255,255,0.04)',
+                color: 'rgba(0,0,0,0.04)',
                 drawTicks: false
               },
               border: { display: false, dash: [2, 2] },
               ticks: {
-                color: '#636366',
+                color: '#8E8E93',
                 font: { family: 'Inter', size: 11 },
                 maxTicksLimit: 5,
                 callback: v => (v >= 1000 ? (v/1000).toFixed(0)+'k' : v)
@@ -550,7 +572,7 @@
               grid: { display: false },
               border: { display: false },
               ticks: {
-                color: '#636366',
+                color: '#8E8E93',
                 font: { family: 'Inter', size: 11 },
                 maxTicksLimit: 5,
                 callback: v => v + '%'
@@ -578,7 +600,6 @@
         `;
         el.appendChild(d);
       });
-      // Animate bars after paint
       requestAnimationFrame(() => {
         document.querySelectorAll('.bar-fill').forEach(b => {
           b.style.width = b.dataset.w;
