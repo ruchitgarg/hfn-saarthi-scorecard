@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saarthi Scorecard — HFN</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; }
+  .header { background: #1a1a1a; color: white; padding: 24px 32px; }
+  .header h1 { font-size: 24px; font-weight: 700; }
+  .header p { font-size: 13px; color: #aaa; margin-top: 4px; }
+  .stats { display: flex; gap: 16px; padding: 20px 32px; flex-wrap: wrap; }
+  .stat { background: white; border-radius: 10px; padding: 16px 20px; min-width: 130px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .stat .val { font-size: 28px; font-weight: 700; }
+  .stat .lbl { font-size: 11px; color: #888; margin-top: 2px; text-transform: uppercase; letter-spacing: .5px; }
+  .stat.a .val { color: #16a34a; }
+  .stat.b .val { color: #2563eb; }
+  .stat.c .val { color: #d97706; }
+  .stat.d .val { color: #dc2626; }
+  .controls { display: flex; gap: 12px; padding: 0 32px 16px; flex-wrap: wrap; align-items: center; }
+  .controls input, .controls select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; background: white; }
+  .controls input { width: 260px; }
+  .badge-count { background: #e5e7eb; color: #374151; font-size: 12px; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
+  .table-wrap { padding: 0 32px 32px; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  th { background: #f9fafb; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: #6b7280; padding: 12px 16px; text-align: left; cursor: pointer; user-select: none; white-space: nowrap; }
+  th:hover { background: #f3f4f6; }
+  th.sorted { color: #1a1a1a; }
+  td { padding: 12px 16px; font-size: 13px; border-top: 1px solid #f3f4f6; }
+  tr:hover td { background: #fafafa; }
+  .grade { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; font-weight: 700; font-size: 12px; }
+  .grade-A { background: #dcfce7; color: #16a34a; }
+  .grade-B { background: #dbeafe; color: #2563eb; }
+  .grade-C { background: #fef3c7; color: #d97706; }
+  .grade-D { background: #fee2e2; color: #dc2626; }
+  .score-bar { display: flex; align-items: center; gap: 8px; }
+  .bar { height: 6px; border-radius: 3px; background: #e5e7eb; width: 60px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; }
+  .fill-A { background: #16a34a; }
+  .fill-B { background: #2563eb; }
+  .fill-C { background: #d97706; }
+  .fill-D { background: #dc2626; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .pill-yes { background: #dcfce7; color: #16a34a; }
+  .pill-no { background: #f3f4f6; color: #9ca3af; }
+  .pill-multi { background: #e0e7ff; color: #4f46e5; }
+  .name-cell { font-weight: 600; }
+  .phone { font-size: 12px; color: #6b7280; margin-top: 2px; font-family: monospace; }
+  .pagination { display: flex; align-items: center; gap: 12px; padding: 16px 32px; justify-content: center; }
+  .pagination button { padding: 8px 16px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; font-size: 13px; }
+  .pagination button:hover { background: #f3f4f6; }
+  .pagination button:disabled { opacity: .4; cursor: default; }
+  .pagination .info { font-size: 13px; color: #6b7280; }
+  .no-results { text-align: center; padding: 48px; color: #9ca3af; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🌾 Saarthi Scorecard</h1>
+  <p>HFN Field Network — 1,320 Saarthis · Last updated: Mar 6, 2026</p>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="Search name, state, district..." oninput="applyFilters()">
+  <select id="gradeFilter" onchange="applyFilters()">
+    <option value="">All Grades</option>
+    <option value="A">Grade A (Score ≥ 75)</option>
+    <option value="B">Grade B (50–74)</option>
+    <option value="C">Grade C (25–49)</option>
+    <option value="D">Grade D (&lt; 25)</option>
+  </select>
+  <select id="stateFilter" onchange="applyFilters()">
+    <option value="">All States</option>
+  </select>
+  <select id="kisnFilter" onchange="applyFilters()">
+    <option value="">KisanCenter: All</option>
+    <option value="yes">Linked to KisanCenter</option>
+    <option value="no">Not linked</option>
+  </select>
+  <span class="badge-count" id="resultCount">0 saarthis</span>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th onclick="sortBy('score')" id="th-score">Score ▾</th>
+        <th onclick="sortBy('name')" id="th-name">Saarthi</th>
+        <th onclick="sortBy('state')" id="th-state">State</th>
+        <th onclick="sortBy('district')" id="th-district">District</th>
+        <th onclick="sortBy('farmers')" id="th-farmers">Farmers</th>
+        <th onclick="sortBy('reachable')" id="th-reachable">Reachable</th>
+        <th onclick="sortBy('geo')" id="th-geo">Has Geo</th>
+        <th>KisanCenter</th>
+        <th>Multi-State</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<div class="pagination">
+  <button onclick="prevPage()" id="btnPrev">← Prev</button>
+  <span class="info" id="pageInfo"></span>
+  <button onclick="nextPage()" id="btnNext">Next →</button>
+</div>
+
+<script>
+let allData = [];
+let filtered = [];
+let sortCol = 'score';
+let sortAsc = false;
+let page = 0;
+const PAGE_SIZE = 25;
+
+async function loadData() {
+  const resp = await fetch('data.json');
+  allData = await resp.json();
+  populateStateFilter();
+  renderStats();
+  applyFilters();
+}
+
+function populateStateFilter() {
+  const states = [...new Set(allData.map(s => s.state).filter(s => s !== 'Unknown'))].sort();
+  const sel = document.getElementById('stateFilter');
+  states.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s; opt.textContent = s;
+    sel.appendChild(opt);
+  });
+}
+
+function renderStats() {
+  const grades = {A:0,B:0,C:0,D:0};
+  allData.forEach(s => grades[s.grade]++);
+  const totalFarmers = allData.reduce((a,s) => a + s.farmers, 0);
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="val">${allData.length.toLocaleString()}</div><div class="lbl">Total Saarthis</div></div>
+    <div class="stat"><div class="val">${totalFarmers.toLocaleString()}</div><div class="lbl">Total Farmers</div></div>
+    <div class="stat a"><div class="val">${grades.A}</div><div class="lbl">Grade A</div></div>
+    <div class="stat b"><div class="val">${grades.B}</div><div class="lbl">Grade B</div></div>
+    <div class="stat c"><div class="val">${grades.C}</div><div class="lbl">Grade C</div></div>
+    <div class="stat d"><div class="val">${grades.D}</div><div class="lbl">Grade D</div></div>
+  `;
+}
+
+function applyFilters() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const grade = document.getElementById('gradeFilter').value;
+  const state = document.getElementById('stateFilter').value;
+  const kisan = document.getElementById('kisnFilter').value;
+
+  filtered = allData.filter(s => {
+    if (grade && s.grade !== grade) return false;
+    if (state && s.state !== state) return false;
+    if (kisan === 'yes' && !s.kisan) return false;
+    if (kisan === 'no' && s.kisan) return false;
+    if (q) {
+      const hay = `${s.name} ${s.state} ${s.district} ${s.phone}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  sortData();
+  page = 0;
+  render();
+}
+
+function sortBy(col) {
+  if (sortCol === col) sortAsc = !sortAsc;
+  else { sortCol = col; sortAsc = col === 'name'; }
+  document.querySelectorAll('th').forEach(t => t.classList.remove('sorted'));
+  document.getElementById(`th-${col}`)?.classList.add('sorted');
+  sortData(); page = 0; render();
+}
+
+function sortData() {
+  filtered.sort((a, b) => {
+    let va = a[sortCol], vb = b[sortCol];
+    if (typeof va === 'string') va = va.toLowerCase();
+    if (typeof vb === 'string') vb = vb.toLowerCase();
+    if (va < vb) return sortAsc ? -1 : 1;
+    if (va > vb) return sortAsc ? 1 : -1;
+    return 0;
+  });
+}
+
+function render() {
+  const tbody = document.getElementById('tbody');
+  const start = page * PAGE_SIZE;
+  const slice = filtered.slice(start, start + PAGE_SIZE);
+
+  document.getElementById('resultCount').textContent = `${filtered.length.toLocaleString()} saarthis`;
+  document.getElementById('pageInfo').textContent = `Page ${page+1} of ${Math.max(1, Math.ceil(filtered.length/PAGE_SIZE))} · ${filtered.length} total`;
+  document.getElementById('btnPrev').disabled = page === 0;
+  document.getElementById('btnNext').disabled = (page+1) * PAGE_SIZE >= filtered.length;
+
+  if (!slice.length) {
+    tbody.innerHTML = '<tr><td colspan="9" class="no-results">No saarthis match your filters.</td></tr>';
+    return;
+  }
+
+  const reachPct = s => s.farmers ? Math.round(s.reachable/s.farmers*100) : 0;
+  const geoPct   = s => s.farmers ? Math.round(s.geo/s.farmers*100) : 0;
+
+  tbody.innerHTML = slice.map(s => `
+    <tr>
+      <td>
+        <div class="score-bar">
+          <span class="grade grade-${s.grade}">${s.grade}</span>
+          <div class="bar"><div class="bar-fill fill-${s.grade}" style="width:${s.score}%"></div></div>
+          <span>${s.score}</span>
+        </div>
+      </td>
+      <td>
+        <div class="name-cell">${esc(s.name)}</div>
+        <div class="phone">${esc(s.phone)}</div>
+      </td>
+      <td>${esc(s.state)}</td>
+      <td>${esc(s.district)}</td>
+      <td><strong>${s.farmers.toLocaleString()}</strong></td>
+      <td>${s.reachable.toLocaleString()} <span style="color:#9ca3af;font-size:11px">(${reachPct(s)}%)</span></td>
+      <td>${s.geo.toLocaleString()} <span style="color:#9ca3af;font-size:11px">(${geoPct(s)}%)</span></td>
+      <td><span class="pill ${s.kisan ? 'pill-yes' : 'pill-no'}">${s.kisan ? '✓ Yes' : 'No'}</span></td>
+      <td><span class="pill ${s.multi_state ? 'pill-multi' : 'pill-no'}">${s.multi_state ? 'Multi' : 'Single'}</span></td>
+    </tr>
+  `).join('');
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function prevPage() { if (page > 0) { page--; render(); } }
+function nextPage() { if ((page+1)*PAGE_SIZE < filtered.length) { page++; render(); } }
+
+loadData();
+</script>
+</body>
+</html>
